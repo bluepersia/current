@@ -2,11 +2,46 @@ import { API_URL } from '../utility.js';
 
 export default class Recipe 
 {
-    constructor (results)
+    constructor (results, bookmarks)
     {
         this.results = results;
         
         const recipeEl = document.querySelector ('.recipe');
+
+        recipeEl.addEventListener ('click',  ({target}) =>
+        {
+
+            if (target.closest ('.bookmark-btn'))
+            {
+                bookmarks.bookmark (this.recipe);
+            }
+            else if (target.closest ('.btn-serving'))
+            {
+                let newServings = this.recipe.servings;
+
+                if (target.closest ('.btn--decrease-servings'))
+                    newServings = newServings - 1;
+                else if (target.closest ('.btn--increase-servings'))
+                    newServings = newServings + 1;
+
+                if (newServings > 8 || newServings < 1)
+                    return;
+
+                if (newServings == this.recipe.servings)
+                return;
+
+                const change = newServings / this.recipe.servings;
+
+                for(const ingredient of this.recipe.ingredients)
+                    ingredient.quantity *= change;
+
+                this.recipe.cooking_time *= change;
+
+                this.recipe.servings = newServings;
+
+                renderRecipe ();
+            }
+        });
 
         const renderRecipe = () => {
 
@@ -27,7 +62,7 @@ export default class Recipe
                 <svg class="recipe__info-icon">
                     <use href="src/img/icons.svg#icon-clock"></use>
                 </svg>
-                <span class="recipe__info-data recipe__info-data--minutes">${cooking_time}</span>
+                <span class="recipe__info-data recipe__info-data--minutes">${cooking_time.toFixed (0)}</span>
                 <span class="recipe__info-text">minutes</span>
                 </div>
                 <div class="recipe__info">
@@ -38,12 +73,12 @@ export default class Recipe
                 <span class="recipe__info-text">servings</span>
 
                 <div class="recipe__info-buttons">
-                    <button class="btn--tiny btn--increase-servings">
+                    <button class="btn--tiny btn--decrease-servings btn-serving">
                     <svg>
                         <use href="src/img/icons.svg#icon-minus-circle"></use>
                     </svg>
                     </button>
-                    <button class="btn--tiny btn--increase-servings">
+                    <button class="btn--tiny btn--increase-servings btn-serving">
                     <svg>
                         <use href="src/img/icons.svg#icon-plus-circle"></use>
                     </svg>
@@ -56,7 +91,7 @@ export default class Recipe
                     <use href="src/img/icons.svg#icon-user"></use>
                 </svg>
                 </div>
-                <button class="btn--round">
+                <button class="btn--round bookmark-btn">
                 <svg class="">
                     <use href="src/img/icons.svg#icon-bookmark-fill"></use>
                 </svg>

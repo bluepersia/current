@@ -1,3 +1,5 @@
+import { getRecipeHTML } from '../utility.js';
+
 export default class Results 
 {
     constructor (search)
@@ -9,23 +11,7 @@ export default class Results
         const renderResults = () => {
             
             
-            document.querySelector ('.results').innerHTML = this.recipes.slice ((this.page * 10) - 10, this.page * 10).map (({id, image_url, publisher, title}) => `
-            <li class="preview" data-id=${id}>
-                <a class="preview__link ${this.currentRecipeId == id ? "preview__link--active" : ""}" href="#${id}">
-                <figure class="preview__fig">
-                    <img src="${image_url}" alt="" />
-                </figure>
-                <div class="preview__data">
-                    <h4 class="preview__title">${title}</h4>
-                    <p class="preview__publisher">${publisher}</p>
-                    <div class="preview__user-generated">
-                    <svg>
-                        <use href="src/img/icons.svg#icon-user"></use>
-                    </svg>
-                    </div>
-                </div>
-                </a>
-            </li>`).join ('');
+            document.querySelector ('.results').innerHTML = this.recipes.slice ((this.page * 10) - 10, this.page * 10).map (recipe => getRecipeHTML(recipe, this.currentRecipeId == recipe.Id)).join ('');
 
             const paginationEl = document.querySelector ('.pagination');
             let paginationHTML = ``;
@@ -58,7 +44,7 @@ export default class Results
 
         this.currentRecipeId = null;
 
-        document.querySelector ('.search-results').addEventListener ('click',  ({target}) =>
+        document.body.addEventListener ('click',  ({target}) =>
         {
             const preview = target.closest ('.preview');
             if (preview && preview.dataset.id)
